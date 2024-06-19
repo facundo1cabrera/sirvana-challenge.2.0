@@ -22,13 +22,13 @@ export async function POST(req: Request) {
 
         const agg = [
             {
-              '$vectorSearch': {
-                'index': 'vector_index', 
-                'path': 'plot_embedding', 
-                'queryVector': embedding, 
-                'numCandidates': 150, 
-                'limit': 10
-              }
+                '$vectorSearch': {
+                    'index': 'vector_index',
+                    'path': 'plot_embedding',
+                    'queryVector': embedding,
+                    'numCandidates': 150,
+                    'limit': 10
+                }
             }, {
                 "$project": {
                     "_id": 1,
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
                     "product": 0
                 }
             }
-          ];
+        ];
 
         const result = coll.aggregate(agg);
 
