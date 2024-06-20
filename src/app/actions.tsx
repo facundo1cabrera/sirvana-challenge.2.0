@@ -27,7 +27,7 @@ export async function getResponse(prompt: string) {
                     'path': 'plot_embedding',
                     'queryVector': embedding,
                     'numCandidates': 150,
-                    'limit': 10
+                    'limit': 4
                 }
             }, {
                 "$project": {
