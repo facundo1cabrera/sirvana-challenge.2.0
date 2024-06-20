@@ -1,5 +1,6 @@
 "use client";
 import { KeyboardEvent, useState } from "react";
+import { unstable_noStore as noStore } from 'next/cache';
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { getResponse } from "./actions";
 import { readStreamableValue } from "ai/rsc";
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 export default function Home() {
+  noStore();
   const [value, setValue] = useState("");
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState("");
