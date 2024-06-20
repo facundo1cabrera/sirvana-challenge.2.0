@@ -1,23 +1,28 @@
 "use client";
-import { useChat } from "@ai-sdk/react";
 import { KeyboardEvent, useState } from "react";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { getResponse } from "./actions";
 import { readStreamableValue } from "ai/rsc";
+import { Product } from "@/models/Product";
+import { ProductCard } from "@/components/ProductCard";
 
-export default function Home() {   
+export default function Home() {
   const [value, setValue] = useState("");
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([])
+  const [hasStreamEnded, setHasStreamEnded] = useState(false);
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
 
     if (e.key !== 'Enter') return;
+    setProducts([]);
+    setHasStreamEnded(false);
     setValue("");
     setError("");
-    if (prompt.length < 4) {
-      setError("The prompt length must be at least 4 chracters long");
+    if (prompt.length < 5) {
+      setError("The prompt length must be at least 5 chracters long");
       return;
     }
 
@@ -25,21 +30,21 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const result = await getResponse(prompt);
+      const { stream, products } = await getResponse(prompt);
+      console.log("products", products)
       setLoading(false);
-      let closeId = false;
-      const idsToFetch = [];
-      for await (const content of readStreamableValue(result)) {
-        if (content?.includes('<id>')) {
-          closeId = true;
-          if (content.includes('</id>')) {
-            closeId = false;
-            
-          }
-        } else {
-          setValue(content || '');
-        }
+      setProducts(products.map(x => ({
+        _id: x._id,
+        description: x.description,
+        url: x.description,
+        imageUrl: x.imageUrl,
+        title: x.title
+      })));
+
+      for await (const content of readStreamableValue(stream)) {
+        setValue(content || '');
       }
+      setHasStreamEnded(true);
     } catch (e) {
       setError("An unexpected error occurred, please try again.");
       setLoading(false);
@@ -47,7 +52,7 @@ export default function Home() {
   }
 
   return (
-    <main className="w-full flex  flex-col h-screen justify-center items-center">
+    <main className="w-full flex pt-10 flex-col justify-center items-center">
       <h1 className="mb-4 text-3xl text-center">Where knowledge begins</h1>
       <div className="w-full sm:w-1/3 hover:shadow-sm border-2">
         <ReactTextareaAutosize
@@ -75,8 +80,19 @@ export default function Home() {
             </>
           )
           : (
-            <div className="w-full sm:w-1/3 pt-4 text-base" >{value}</div>
+            <div className="w-full sm:w-1/3 pt-4 text-base">{value}</div>
           )
+      }
+      {
+        !hasStreamEnded
+          ? <></>
+          : <div className="pt-2">
+            {products.map(x => (
+              <ProductCard 
+                key={x._id}
+                product={x} />
+            ))}
+          </div>
       }
       {
         error ?

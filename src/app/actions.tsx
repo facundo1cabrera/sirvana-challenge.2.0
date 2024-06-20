@@ -33,16 +33,17 @@ export async function getResponse(prompt: string) {
                 "$project": {
                     "_id": 1,
                     "plot_embedding": 0,
-                    "product": 0
                 }
             }
         ];
 
         const result = coll.aggregate(agg);
 
-        let document = []
+        const document = []
+        const products = []
         for await (const res of result) {
-            document.push(res._id.toString())
+            document.push(res._id.toString());
+            products.push(res)
         }
 
         const retrievedPrompt = `
@@ -53,17 +54,23 @@ QUESTION:
 ${prompt}
 
 INSTRUCTIONS:
-Answer the users QUESTION and add related code ids from the DOCUMENT if possible with <id>productId</id>
+Answer the users QUESTION and add related code ids from the DOCUMENT if possible
 `;
-        console.log(document)
-
         const response = await streamText({
             model: openai('gpt-4-turbo'),
             prompt: retrievedPrompt,
         });
 
         const stream = createStreamableValue(response.textStream);
-        return stream.value;
+        return {
+            stream: stream.value, products: products.map(x => ({
+                _id: x._id.toString(),
+                description: x.product.description,
+                url: x.product.description,
+                imageUrl: x.product.imageUrl,
+                title: x.product.title
+            }))
+        }
     } catch (error) {
         throw new Error("Error getting a response.")
     }
@@ -81,7 +88,7 @@ export async function getProductData(id: string) {
         const database = client.db("sirvana-challenge");
         const coll = database.collection("products");
 
-        const product = await coll.findOne({ _id: new ObjectId(id) });
+        const product = await coll.find({ _id: new ObjectId(id) });
 
         return product;
     } catch (error) {
