@@ -33,16 +33,16 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const { stream, products } = await getResponse(prompt);
+      const stream = await getResponse(prompt);
       console.log("products", products)
       setLoading(false);
-      setProducts(products.map(x => ({
-        _id: x._id,
-        description: x.description,
-        url: x.description,
-        imageUrl: x.imageUrl,
-        title: x.title
-      })));
+      // setProducts(products.map(x => ({
+      //   _id: x._id,
+      //   description: x.description,
+      //   url: x.description,
+      //   imageUrl: x.imageUrl,
+      //   title: x.title
+      // })));
 
       for await (const content of readStreamableValue(stream)) {
         setValue(content || '');

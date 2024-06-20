@@ -63,15 +63,16 @@ Answer the users QUESTION and add related code ids from the DOCUMENT if possible
         });
 
         const stream = createStreamableValue(response.textStream);
-        return {
-            stream: stream.value, products: products.map(x => ({
-                _id: x._id.toString(),
-                description: x.product.description,
-                url: x.product.description,
-                imageUrl: x.product.imageUrl,
-                title: x.product.title
-            }))
-        }
+        return stream.value
+        // {
+        //     stream: stream.value, products: products.map(x => ({
+        //         _id: x._id.toString(),
+        //         description: x.product.description,
+        //         url: x.product.description,
+        //         imageUrl: x.product.imageUrl,
+        //         title: x.product.title
+        //     }))
+        // }
     } catch (error) {
         console.log(error);
         throw new Error("Error getting a response.")
