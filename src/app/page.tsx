@@ -6,6 +6,9 @@ import { readStreamableValue } from "ai/rsc";
 import { Product } from "@/models/Product";
 import { ProductCard } from "@/components/ProductCard";
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
+
 export default function Home() {
   const [value, setValue] = useState("");
   const [prompt, setPrompt] = useState("");

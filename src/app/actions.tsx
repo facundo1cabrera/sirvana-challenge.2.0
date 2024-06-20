@@ -7,6 +7,7 @@ import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 export async function getResponse(prompt: string) {
+    'use server';
     const client = await clientPromise;
 
     try {
