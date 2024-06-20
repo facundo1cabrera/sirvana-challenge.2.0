@@ -72,6 +72,7 @@ Answer the users QUESTION and add related code ids from the DOCUMENT if possible
             }))
         }
     } catch (error) {
+        console.log(error);
         throw new Error("Error getting a response.")
     }
     finally {
